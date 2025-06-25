@@ -13,12 +13,10 @@ A simple 2D mining game built with **Pygame**. Use arrow keys to move and left-c
 ---
 
 ## 🎮 Features
-
+- ⬆️ Arrow key movement's
 - ✅ Tile-based grid world
 - 🧱 Different block types: sky, dirt, and stone
-- 👨‍🌾 Player movement with collision detection
 - ⛏️ Mining mechanic with mouse clicks
-- 🧱 Prevents walking into the upper sky barrier
 
 ---
 
