@@ -38,5 +38,5 @@ A simple 2D mining game built with **Pygame**. Use arrow keys to move and left-c
    cd simple-mining-game
 
 ---
-## Newest Updates:
+## 🔨 Newest Updates:
 **cannot walk into the top sky barrier**
