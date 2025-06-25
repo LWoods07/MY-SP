@@ -6,9 +6,8 @@ A simple 2D mining game built with **Pygame**. Use arrow keys to move and left-c
 
 ## 📸 Screenshot
 
+![image](https://github.com/user-attachments/assets/877a5921-af4d-4397-9bff-996f3aaa943e)
 
-
-> Don't forget to replace `images/game-screenshot.png` with your actual screenshot or GIF.
 
 ---
 
