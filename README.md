@@ -12,7 +12,7 @@ A simple 2D mining game built with **Pygame**. Use arrow keys to move and left-c
 ---
 
 ## 🎮 Features
-- ⬆️ Arrow key movement's
+- ⬆️ W,A,S,D key movement's
 - ✅ Tile-based grid world
 - 🧱 Different block types: sky, dirt, and stone
 - ⛏️ Mining mechanic with mouse clicks
@@ -21,9 +21,9 @@ A simple 2D mining game built with **Pygame**. Use arrow keys to move and left-c
 
 ## 🕹️ How to Play
 
-- Move using **arrow keys** (⬅️ ➡️ ⬆️ ⬇️)
+- Move using **W,A,S,D** 
 - Left-click to **mine adjacent blocks**
-
+- Sell ore to get Values and upgrade your pickaxe to mine more!! **Go to green block to sell**
 ---
 
 ## 🧰 Installation
@@ -38,3 +38,4 @@ A simple 2D mining game built with **Pygame**. Use arrow keys to move and left-c
 ## 🔨 UPDATE LOGS:
 **cannot walk into the top sky barrier**
 **Added ores + a sell shop**
+**Revamped movement keys to be WASD**
