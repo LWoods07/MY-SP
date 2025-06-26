@@ -40,10 +40,7 @@ for row in range(GRID_HEIGHT):
         if row < 4:
             row_data.append(0)
         elif row < 9:
-            if random.random() < 0.1:
-                row_data.append(random.choice([3, 4])) # Random ore
-            else:
-                row_data.append(1)
+            row_data.append(1)
         else:
             if random.random() < 0.15:
                 row_data.append(random.choice([3, 4]))
@@ -58,13 +55,20 @@ world[shop_y][shop_x] = 5
 
 
 # Player position
-player_x = 5
-player_y = 3
+player_x, player_y = 5, 3
 
 
 # Inventory and money
 inventory = {3: 0, 4: 0}
 money = 0
+
+
+
+# Pickaxe level and upgrades
+pickaxe_level = 1
+upgrade_costs = {1: 100, 2: 250}
+show_upgrade_menu = False
+
 
 #font to display money
 font = pygame.font.SysFont("Arial", 20)
@@ -85,6 +89,24 @@ def draw_ui():
     money_text = font.render(f" ${money}", True, (255, 255, 255))
     screen.blit(money_text, (SCREEN_WIDTH - 120, 10))
 
+    level_text = font.render(f"Pickaxe: {pickaxe_level}x{pickaxe_level}", True, (255, 255, 255))
+    screen.blit(level_text, (10, 10))
+
+def draw_upgrade_menu():
+    pygame.draw.rect(screen, (30, 30, 30), (SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 75, 300, 150))
+    pygame.draw.rect(screen, (255, 255, 255), (SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 75, 300, 150), 2)
+
+    title = font.render("Upgrade Piickaxe", True, (255, 255, 255))
+    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, SCREEN_HEIGHT // 2 - 65))
+
+    if pickaxe_level < 3:
+        next_level = pickaxe_level + 1
+        cost = upgrade_costs[pickaxe_level]
+        text = font.render(f"Upgrade to {next_level}x{next_level} for ${cost} [E]", True, (200, 200, 0))
+    else:
+        text = font.render("Max level reached!", True, (150, 150, 150))
+
+    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2))
 def is_adjacent(px, py, bx, by):
     return abs(px - bx) <= 1 and abs(py - by) <= 1
 
@@ -105,15 +127,32 @@ def sell_ores():
         print(f"Sold ores for ${total}!")
 
 
+def mine_block_area(center_x, center_y):
+    for dy in range(-(pickaxe_level // 2), (pickaxe_level // 2) + 1):
+        for dx in range(-(pickaxe_level // 2), (pickaxe_level // 2) + 1):
+            x = center_x + dx
+            y = center_y + dy
+            if 0 <= x < GRID_WIDTH and 0 <= y < GRID_HEIGHT:
+                tile = world[y][x]
+                if tile in [1, 2, 3, 4]:
+                    if tile in inventory:
+                        inventory[tile] += 1
+                    world[y][x] = 0
 
 
-# Game loop
+
+# Main loop
 running = True
 while running:
     screen.fill((0, 0, 0))
     draw_world()
     draw_player()
     draw_ui()
+
+    if show_upgrade_menu:
+        draw_upgrade_menu()
+
+
     pygame.display.update()
 
     for event in pygame.event.get():
@@ -125,15 +164,26 @@ while running:
             mouse_x, mouse_y = pygame.mouse.get_pos()
             block_x = mouse_x // TILE_SIZE
             block_y = mouse_y // TILE_SIZE
-
             if 0 <= block_x < GRID_WIDTH and 0 <= block_y < GRID_HEIGHT:
                 if is_adjacent(player_x, player_y, block_x, block_y):
-                    tile = world[block_y][block_x]
-                    if tile in [1, 2, 3, 4]:
-                        if tile in inventory:
-                            inventory[tile] += 1 #add's ore to inventory
-                    world[block_y][block_x] = 0  # Mine the block
+                    mine_block_area(block_x, block_y)  # Mine the block
 
+
+
+
+        # Key press actions
+        if event.type == pygame.KEYDOWN:
+            if world[player_y][player_x] == 5:
+                if event.key == pygame.K_u:
+                    show_upgrade_menu = not show_upgrade_menu
+
+
+                if event.key == pygame.K_e and pickaxe_level < 3:
+                    cost = upgrade_costs[pickaxe_level]
+                    if money >= cost:
+                        money -= cost
+                        pickaxe_level += 1
+                        print(f"Upgraded to {pickaxe_level}x{pickaxe_level} pickaxe!")
     # Movement (with collision check)
     keys = pygame.key.get_pressed()
     if keys[pygame.K_a]:
