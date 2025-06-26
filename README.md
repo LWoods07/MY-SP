@@ -23,7 +23,7 @@ A simple 2D mining game built with **Pygame**. Use arrow keys to move and left-c
 
 - Move using **W,A,S,D** 
 - Left-click to **mine adjacent blocks**
-- Sell ore to get Values and upgrade your pickaxe to mine more!! **Go to green block to sell**
+- Sell ore to get Values and upgrade your pickaxe to mine more!! **Go to green block to sell and go to **
 ---
 
 ## 🧰 Installation
@@ -39,3 +39,4 @@ A simple 2D mining game built with **Pygame**. Use arrow keys to move and left-c
 **cannot walk into the top sky barrier**
 **Added ores + a sell shop**
 **Revamped movement keys to be WASD**
+**Upgrade Shop + Pickaxe Upgrades**
