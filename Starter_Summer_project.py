@@ -137,7 +137,7 @@ def reset_ground():
                     world[row][col] = random.choice([3, 4])  # Gold/Iron
                 else:
                     world[row][col] = 2  # Stone
-    print("Ground reset! Dirt and ores regenerated.")
+    print("Ground reset! Dirt and ores have been restored.")
 
 
 def mine_block_area(center_x, center_y):
