@@ -21,56 +21,58 @@ BLOCK_COLORS = {
     1: (139, 69, 19),    # Dirt
     2: (105, 105, 105),  # Stone
     3: (255, 215, 0),    # Gold
-    4: (192, 192, 192),   # Iron
-    5: (0, 128, 0)    # Shop (Green)
+    4: (192, 192, 192),  # Iron
+    5: (0, 128, 0),      # Shop (Green)
+    6: (0, 0, 255)       # Reset Station (Blue)
 }
-
 
 # Ore values
 ORE_VALUES = {
-    3: 50, #Gold
-    4: 20  #Iron
+    3: 50,  # Gold
+    4: 20   # Iron
 }
 
 # Generate the world
-world = []
-for row in range(GRID_HEIGHT):
-    row_data = []
-    for col in range(GRID_WIDTH):
-        if row < 4:
-            row_data.append(0)
-        elif row < 9:
-            row_data.append(1)
-        else:
-            if random.random() < 0.15:
-                row_data.append(random.choice([3, 4]))
+def generate_world():
+    new_world = []
+    for row in range(GRID_HEIGHT):
+        row_data = []
+        for col in range(GRID_WIDTH):
+            if row < 4:
+                row_data.append(0)
+            elif row < 9:
+                row_data.append(1)
             else:
-                row_data.append(2)
-    world.append(row_data)
+                if random.random() < 0.15:
+                    row_data.append(random.choice([3, 4]))
+                else:
+                    row_data.append(2)
+        new_world.append(row_data)
+    return new_world
 
+world = generate_world()
 
-# PLace a shop on the surface
+# Place a shop on the surface
 shop_x, shop_y = 10, 3
 world[shop_y][shop_x] = 5
 
+# Place reset station
+reset_x, reset_y = 9, 3
+world[reset_y][reset_x] = 6
 
 # Player position
 player_x, player_y = 5, 3
 
-
 # Inventory and money
 inventory = {3: 0, 4: 0}
 money = 0
-
-
 
 # Pickaxe level and upgrades
 pickaxe_level = 1
 upgrade_costs = {1: 100, 2: 250}
 show_upgrade_menu = False
 
-
-#font to display money
+# Font to display UI
 font = pygame.font.SysFont("Arial", 20)
 
 def draw_world():
@@ -84,7 +86,6 @@ def draw_world():
 def draw_player():
     pygame.draw.rect(screen, (255, 0, 0), (player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
 
-
 def draw_ui():
     money_text = font.render(f" ${money}", True, (255, 255, 255))
     screen.blit(money_text, (SCREEN_WIDTH - 120, 10))
@@ -96,7 +97,7 @@ def draw_upgrade_menu():
     pygame.draw.rect(screen, (30, 30, 30), (SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 75, 300, 150))
     pygame.draw.rect(screen, (255, 255, 255), (SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 75, 300, 150), 2)
 
-    title = font.render("Upgrade Piickaxe", True, (255, 255, 255))
+    title = font.render("Upgrade Pickaxe", True, (255, 255, 255))
     screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, SCREEN_HEIGHT // 2 - 65))
 
     if pickaxe_level < 3:
@@ -107,13 +108,13 @@ def draw_upgrade_menu():
         text = font.render("Max level reached!", True, (150, 150, 150))
 
     screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2))
+
 def is_adjacent(px, py, bx, by):
     return abs(px - bx) <= 1 and abs(py - by) <= 1
 
 def is_walkable(x, y):
-    """Returns True if block is sky (air) and inside bounds"""
     if 0 <= x < GRID_WIDTH and 0 <= y < GRID_HEIGHT:
-        return world[y][x] in (0, 5)
+        return world[y][x] in (0, 5, 6)
     return False
 
 def sell_ores():
@@ -125,6 +126,18 @@ def sell_ores():
     money += total
     if total > 0:
         print(f"Sold ores for ${total}!")
+
+def reset_ground():
+    for row in range(4, GRID_HEIGHT):
+        for col in range(GRID_WIDTH):
+            if row < 9:
+                world[row][col] = 1  # Dirt layer
+            else:
+                if random.random() < 0.15:
+                    world[row][col] = random.choice([3, 4])  # Gold/Iron
+                else:
+                    world[row][col] = 2  # Stone
+    print("Ground reset! Dirt and ores regenerated.")
 
 
 def mine_block_area(center_x, center_y):
@@ -139,8 +152,6 @@ def mine_block_area(center_x, center_y):
                         inventory[tile] += 1
                     world[y][x] = 0
 
-
-
 # Main loop
 running = True
 while running:
@@ -149,9 +160,14 @@ while running:
     draw_player()
     draw_ui()
 
-    if show_upgrade_menu:
+    # Upgrade shop UI
+    if world[player_y][player_x] == 5:
         draw_upgrade_menu()
 
+    # Reset ground UI
+    if world[player_y][player_x] == 6:
+        reset_text = font.render("Press [R] to Reset Ground", True, (255, 255, 255))
+        screen.blit(reset_text, (SCREEN_WIDTH // 2 - reset_text.get_width() // 2, SCREEN_HEIGHT // 2 + 100))
 
     pygame.display.update()
 
@@ -166,24 +182,20 @@ while running:
             block_y = mouse_y // TILE_SIZE
             if 0 <= block_x < GRID_WIDTH and 0 <= block_y < GRID_HEIGHT:
                 if is_adjacent(player_x, player_y, block_x, block_y):
-                    mine_block_area(block_x, block_y)  # Mine the block
-
-
-
+                    mine_block_area(block_x, block_y)
 
         # Key press actions
         if event.type == pygame.KEYDOWN:
-            if world[player_y][player_x] == 5:
-                if event.key == pygame.K_u:
-                    show_upgrade_menu = not show_upgrade_menu
+            if event.key == pygame.K_e and world[player_y][player_x] == 5 and pickaxe_level < 3:
+                cost = upgrade_costs[pickaxe_level]
+                if money >= cost:
+                    money -= cost
+                    pickaxe_level += 1
+                    print(f"Upgraded to {pickaxe_level}x{pickaxe_level} pickaxe!")
 
+            if event.key == pygame.K_r and world[player_y][player_x] == 6:
+                reset_ground()
 
-                if event.key == pygame.K_e and pickaxe_level < 3:
-                    cost = upgrade_costs[pickaxe_level]
-                    if money >= cost:
-                        money -= cost
-                        pickaxe_level += 1
-                        print(f"Upgraded to {pickaxe_level}x{pickaxe_level} pickaxe!")
     # Movement (with collision check)
     keys = pygame.key.get_pressed()
     if keys[pygame.K_a]:
@@ -210,11 +222,9 @@ while running:
             player_y = new_y
             pygame.time.delay(100)
 
-    
-
+    # Auto-sell ores if on shop tile
     if world[player_y][player_x] == 5:
         sell_ores()
-        
 
     clock.tick(60)
 
