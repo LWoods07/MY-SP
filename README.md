@@ -36,7 +36,12 @@ A simple 2D mining game built with **Pygame**. Use arrow keys to move and left-c
 
 ---
 ## 🔨 UPDATE LOGS:
-**cannot walk into the top sky barrier**
+**Cannot walk into the top sky barrier**
+
 **Added ores + a sell shop**
+
 **Revamped movement keys to be WASD**
-**Upgrade Shop + Pickaxe Upgrades**
+
+**Upgrade button + Pickaxe Upgrades**
+
+**Added a reset layers button + better upgrade mechanics**
